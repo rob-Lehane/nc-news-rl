@@ -3,6 +3,7 @@ const request = require("supertest")
 const db = require("../db/connection.js")
 const seed = require("../db/seeds/seed.js")
 const data = require("../db/data/test-data")
+const endPoints = require("../endpoints.json")
 
 beforeEach(() => {
     return seed(data);
@@ -36,8 +37,13 @@ describe('GET /api/topics', () => {
     })
 })
 
-// gets all topics from /api/topics
-// returns an array of topic objects with slug & description properties
-// add error handling tests
-// test 1: returns 200 status code and array of objects (3 objects)
-// error testing: 404? 
+describe('GET /api/', () => {
+	test.only('1. Returns expected information from endpoints.json', () => {
+		return request(app)
+		.get('/api')
+		.expect(200)
+        .then(({body})=> {
+            expect(body.api).toMatchObject(endPoints)
+        })
+    })
+})
