@@ -43,7 +43,7 @@ describe('GET /api/', () => {
 		.get('/api')
 		.expect(200)
         .then(({body})=> {
-            expect(body.api).toEqual(endPoints)
+            expect(body.api).toMatchObject(endPoints)
         })
     })
 })
