@@ -5,6 +5,7 @@ const seed = require("../db/seeds/seed.js")
 const data = require("../db/data/test-data")
 const endPoints = require("../endpoints.json")
 const sorted = require('jest-sorted');
+const { expect } = require("@jest/globals")
 
 beforeEach(() => {
     return seed(data);
@@ -127,7 +128,7 @@ describe('GET /api/articles/', () => {
 })
 });
 
-describe.only('GET /api/articles/:article_id/comment/', () => {
+describe('GET /api/articles/:article_id/comment/', () => {
     test('1. Returns all comments for an article with the correct properties', () => {
         return request(app)
         .get('/api/articles/3/comments')
@@ -167,3 +168,34 @@ describe.only('GET /api/articles/:article_id/comment/', () => {
         })
     })
 })
+
+describe.only('POST /api/articles/:article_id/comments', () => {
+    test('1. Returns comment', () => {
+        return request(app)
+        .post('/api/articles/2/comments')
+        .send({ username: 'rogersop', body: 'test comment, from rogersop.'})
+    .then((res) => {
+        expect(201)
+        expect(res.body.comment).toEqual('test comment, from rogersop.')
+    })
+    })
+    test('2. Returns 404 when given an invalid article ID', () => {
+        return request(app)
+        .post('/api/articles/459/comments')
+        .send({ username: 'rogersop', body: 'test comment 2, from rogersop.'})
+        .expect(404)
+    })
+    })
+    test('3. Returns 400 error when a username that does not exist is given', () => {
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send({ username: 'john', body: 'test comment from john'})
+        .expect(400)
+    })
+    test('4. Returns 400 error when a blank comment is given', () => {
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send({ username: 'john', body: ''})
+        .expect(400)
+    })
+

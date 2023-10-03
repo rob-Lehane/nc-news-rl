@@ -1,4 +1,4 @@
-const { fetchCommentsByArticle } = require('../models/comments.model')
+const { fetchCommentsByArticle, postNewComment } = require('../models/comments.model')
 const { doesArticleExist } = require('../models/articles.model')
 
 exports.getCommentsByArticle = (req, res, next) => {
@@ -15,4 +15,28 @@ exports.getCommentsByArticle = (req, res, next) => {
     }
     })
     .catch(next); 
+};
+
+exports.addNewComment = (req, res, next) => {
+    const articleId = +req.params.article_id;
+    const { username, body } = req.body;
+    if (Object.keys(req.body).length > 2) {
+    res.status(400).send({ err: 400, msg: 'Comment can only contain username + body' });
+    }
+    if (body.length === 0){
+        res.status(400).send({ err: 400, msg: 'Comment cannot be blank'})
+    }
+    doesArticleExist(articleId)
+    .then((articleExists) => {
+        if (!articleExists) {
+        res.status(404).send({ message: `Article not found for article ID: ${articleId}` });
+        } else {
+        postNewComment(articleId, username, body)
+            .then((comment) => {
+            res.status(201).send({ comment });
+            })
+            .catch(next);
+        }
+    })
+    .catch(next);
 };
