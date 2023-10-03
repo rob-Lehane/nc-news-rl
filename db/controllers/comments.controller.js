@@ -19,10 +19,10 @@ exports.getCommentsByArticle = (req, res, next) => {
 
 exports.addNewComment = (req, res, next) => {
     const articleId = +req.params.article_id;
+    if (Object.keys(req.body).length < 2) {
+        res.status(400).send({ err: 400, msg: 'Comment must contain username and body' });
+        }
     const { username, body } = req.body;
-    if (Object.keys(req.body).length > 2) {
-    res.status(400).send({ err: 400, msg: 'Comment can only contain username + body' });
-    }
     if (body.length === 0){
         res.status(400).send({ err: 400, msg: 'Comment cannot be blank'})
     }
