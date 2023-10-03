@@ -4,6 +4,7 @@ const db = require("../db/connection.js")
 const seed = require("../db/seeds/seed.js")
 const data = require("../db/data/test-data")
 const endPoints = require("../endpoints.json")
+const sorted = require('jest-sorted');
 
 beforeEach(() => {
     return seed(data);
@@ -83,7 +84,7 @@ describe('GET /api/articles/:article_id', () => {
     })
 })
 
-describe.only('GET /api/articles/', () => {
+describe('GET /api/articles/', () => {
     test('1. Responds with an array of article objects with the correct properties', () => {
         return request(app)
         .get('/api/articles')
@@ -125,3 +126,44 @@ describe.only('GET /api/articles/', () => {
     .expect(404)
 })
 });
+
+describe.only('GET /api/articles/:article_id/comment/', () => {
+    test('1. Returns all comments for an article with the correct properties', () => {
+        return request(app)
+        .get('/api/articles/3/comments')
+        .expect(200)
+        .then(({body}) => {
+            body.comments.forEach((comment) => {
+                expect(comment).toHaveProperty('comment_id')
+                expect(comment).toHaveProperty('votes')
+                expect(comment).toHaveProperty('created_at')
+                expect(comment).toHaveProperty('author')
+                expect(comment).toHaveProperty('body')
+                expect(comment).toHaveProperty('article_id')
+            })
+        })
+    })
+    test('2. Returns comments sorted by most recent', () => {
+        return request(app)
+        .get('/api/articles/3/comments')
+        .then(({body}) => {
+            expect(body.comments).toBeSortedBy('created_at', { descending: true });
+        })
+    })
+    test('3. Returns 404 when given an invalid id which is correctly formatted as a number', () => {
+        return request(app)
+        .get('/api/articles/459/comments')
+        .expect(404)
+        .then((res)=> {
+            expect(res.status).toBe(404)
+        })
+    })
+    test('4. Returns 400 when given an invalid id, incorrectly formatted as a string ', () => {
+        return request(app)
+        .get('/api/articles/one/comments')
+        .expect(400)
+        .then((res)=> {
+            expect(res.status).toBe(400)
+        })
+    })
+})
