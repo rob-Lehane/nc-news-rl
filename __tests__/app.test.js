@@ -73,7 +73,7 @@ describe('GET /api/articles/:article_id', () => {
             expect(res.status).toBe(404)
         })
     })
-    test.only('3. Returns 400 when given an invalid id, incorrectly formatted as a string ', () => {
+    test('3. Returns 400 when given an invalid id, incorrectly formatted as a string ', () => {
         return request(app)
         .get('/api/articles/one')
         .expect(400)
@@ -82,3 +82,46 @@ describe('GET /api/articles/:article_id', () => {
         })
     })
 })
+
+describe.only('GET /api/articles/', () => {
+    test('1. Responds with an array of article objects with the correct properties', () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({body}) => {
+            expect(body.articles).toHaveLength(13);
+            body.articles.forEach((article) => {
+                expect(typeof(article.author)).toBe('string')
+                expect(typeof(article.title)).toBe('string')
+                expect(typeof(article.article_id)).toBe('number')
+                expect(typeof(article.topic)).toBe('string')
+                const receivedTimestamp = Date.parse(article.created_at);
+                expect(typeof(receivedTimestamp)).toBe('number');
+                expect(typeof(article.votes)).toBe('number')
+                expect(typeof(article.article_img_url)).toBe('string')
+                expect(typeof(article.comment_count)).toBe('string')
+            })
+        })
+    })
+    test('2. Should be sorted by date in descending order', () => {
+        return request(app)
+        .get('/api/articles')
+        .then(({body}) => {
+            expect(body.articles[0].title).toBe('Eight pug gifs that remind me of mitch')
+        })
+    });
+    test('3. There should not be a body property present on any of the article objects', () => {
+        return request(app)
+        .get('/api/articles')
+        .then(({body}) => {
+            body.articles.forEach((article) => {
+                expect(article).not.toHaveProperty('body');
+        })
+    })
+})
+    test('4. Should return a 404 error if the endpoint is mis-spelled', () => {
+    return request(app)
+    .get('/api/arcticles')
+    .expect(404)
+})
+});
