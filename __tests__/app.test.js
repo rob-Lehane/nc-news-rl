@@ -38,12 +38,47 @@ describe('GET /api/topics', () => {
 })
 
 describe('GET /api/', () => {
-	test.only('1. Returns expected information from endpoints.json', () => {
+	test('1. Returns expected information from endpoints.json', () => {
 		return request(app)
 		.get('/api')
 		.expect(200)
         .then(({body})=> {
             expect(body.api).toMatchObject(endPoints)
+        })
+    })
+})
+
+describe('GET /api/articles/:article_id', () => {
+    test('1. Returns correct article object', () => {
+        return request(app)
+        .get('/api/articles/3')
+        .expect(200)
+        .then(({body})=> {
+            expect(body.article.author).toBe("icellusedkars")
+            expect(body.article.title).toBe("Eight pug gifs that remind me of mitch")
+            expect(body.article.article_id).toBe(3)
+            expect(body.article.body).toBe("some gifs")
+            expect(body.article.topic).toBe("mitch")
+            const receivedTimestamp = Date.parse(body.article.created_at);
+            expect(receivedTimestamp).toBe(1604394720000);
+            expect(body.article.votes).toBe(0)
+            expect(body.article.article_img_url).toBe("https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700")
+        })
+    })
+    test('2. Returns 404 when given an invalid id which is correctly formatted as a number', () => {
+        return request(app)
+        .get('/api/articles/459')
+        .expect(404)
+        .then((res)=> {
+            expect(res.status).toBe(404)
+        })
+    })
+    test.only('3. Returns 400 when given an invalid id, incorrectly formatted as a string ', () => {
+        return request(app)
+        .get('/api/articles/one')
+        .expect(400)
+        .then((res)=> {
+            expect(res.status).toBe(400)
         })
     })
 })
