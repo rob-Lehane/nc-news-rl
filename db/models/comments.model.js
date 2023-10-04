@@ -1,10 +1,10 @@
-const db = require('../connection')
+const db = require('../connection');
 
 exports.fetchCommentsByArticle = (article_id) => {
     return doesArticleExist(article_id)
         .then((articleExists) => {
             if (!articleExists) {
-                res.status(404).send({ err: 404, msg: `Article not found for article ID: ${articleId}` });
+                throw { status: 404, message: `Article not found for article ID: ${article_id}` };
             }
             return db.query(`SELECT
                 * 
@@ -16,19 +16,28 @@ exports.fetchCommentsByArticle = (article_id) => {
                 comments.created_at DESC`, [article_id])
                 .then(({ rows }) => {
                     return rows;
+                })
+                .catch((err) => {
+                    throw err; 
                 });
+        })
+        .catch((err) => {
+            throw err;
         });
 };
 
 exports.postNewComment = (article_id, author, body) => {
-    if (body.length === 0){
-        res.status(400).send({ err: 400, msg: 'Comment cannot be blank'})
+    if (body.length === 0) {
+        throw { status: 400, message: 'Comment cannot be blank' };
     }
-    else return db.query(`INSERT INTO
-    comments (article_id, author, body)
-    VALUES ($1, $2, $3)
-    RETURNING *`, [article_id, author, body])
-    .then(({rows}) => {
-        return rows[0];
-    })
-}
+    return db.query(`INSERT INTO
+        comments (article_id, author, body)
+        VALUES ($1, $2, $3)
+        RETURNING *`, [article_id, author, body])
+        .then(({ rows }) => {
+            return rows[0];
+        })
+        .catch((err) => {
+            throw err;
+        });
+};
