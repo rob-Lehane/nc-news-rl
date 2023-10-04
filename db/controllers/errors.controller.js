@@ -11,8 +11,11 @@ exports.handleCustomErrors = (err, req, res, next) => {
 }
 
 exports.handle404Error = (err, req, res, next) => {
-    res.status(404).send({ msg: "url not found" });
-  };
+    if (!err.status) {
+        err.status = 404;
+    }
+    res.status(err.status).send({ msg: err.message });
+};
 
 exports.handle500Errors = (err, req, res, next) => {
     console.log("500 error in console", err)
