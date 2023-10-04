@@ -1,18 +1,24 @@
 const db = require('../connection')
 
 exports.fetchCommentsByArticle = (article_id) => {
-    return db.query(`SELECT
-    * 
-    FROM
-    comments
-    WHERE 
-    article_id = $1
-    ORDER BY 
-    comments.created_at DESC`, [article_id])
-    .then(({rows}) => {
-        return rows;
-    })
-}
+    return doesArticleExist(article_id)
+        .then((articleExists) => {
+            if (!articleExists) {
+                res.status(404).send({ err: 404, msg: `Article not found for article ID: ${articleId}` });
+            }
+            return db.query(`SELECT
+                * 
+                FROM
+                comments
+                WHERE 
+                article_id = $1
+                ORDER BY 
+                comments.created_at DESC`, [article_id])
+                .then(({ rows }) => {
+                    return rows;
+                });
+        });
+};
 
 exports.postNewComment = (article_id, author, body) => {
     if (body.length === 0){

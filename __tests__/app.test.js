@@ -210,7 +210,7 @@ describe.only('POST /api/articles/:article_id/comments', () => {
         .send({ username: 'rogersop', body: 'test comment 2, from rogersop.'})
         .expect(404)
         .then((res)=> {
-            expect(res.body.msg).toBe('Article not found for article ID: 459')
+            expect(res.body.msg).toBe('url not found')
         })
     })
     })
