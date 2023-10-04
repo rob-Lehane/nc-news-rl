@@ -5,6 +5,7 @@ const seed = require("../db/seeds/seed.js")
 const data = require("../db/data/test-data")
 const endPoints = require("../endpoints.json")
 const sorted = require('jest-sorted');
+const { expect } = require("@jest/globals")
 
 beforeEach(() => {
     return seed(data);
@@ -127,7 +128,7 @@ describe('GET /api/articles/', () => {
 })
 });
 
-describe.only('GET /api/articles/:article_id/comment/', () => {
+describe('GET /api/articles/:article_id/comment/', () => {
     test('1. Returns all comments for an article with the correct properties', () => {
         return request(app)
         .get('/api/articles/3/comments')
@@ -167,3 +168,86 @@ describe.only('GET /api/articles/:article_id/comment/', () => {
         })
     })
 })
+
+describe.only('POST /api/articles/:article_id/comments', () => {
+    test('1. Returns comment', () => {
+        return request(app)
+        .post('/api/articles/2/comments')
+        .send({ username: 'rogersop', body: 'test comment, from rogersop.'})
+    .then((res) => {
+        expect(201)
+        expect(res.body).toMatchObject({
+            comment: {
+              comment_id: 19,
+              body: 'test comment, from rogersop.',
+              article_id: 2,
+              author: 'rogersop',
+              votes: 0,
+            }
+          })
+    })
+    })
+    test('2. Ignores extra properties on post body', () => {
+        return request(app)
+        .post('/api/articles/2/comments')
+        .send({ username: 'rogersop', body: 'test comment, from rogersop.', extra: 3})
+    .then((res) => {
+        expect(201)
+        expect(res.body).toMatchObject({
+            comment: {
+              comment_id: 19,
+              body: 'test comment, from rogersop.',
+              article_id: 2,
+              author: 'rogersop',
+              votes: 0,
+            }
+          })
+    })
+    })
+    test('3. Returns 404 when given an invalid article ID', () => {
+        return request(app)
+        .post('/api/articles/459/comments')
+        .send({ username: 'rogersop', body: 'test comment 2, from rogersop.'})
+        .expect(404)
+        .then((res)=> {
+            expect(res.body.msg).toBe('url not found')
+        })
+    })
+    })
+    test('4. Returns 400 error when a username that does not exist is given', () => {
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send({ username: 'john', body: 'test comment from john'})
+        .expect(400)
+        .then((res)=> {
+            expect(res.body.msg).toBe('bad request!')
+        })
+    })
+    test('5. Returns 400 error when a blank comment is given', () => {
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send({ username: 'rogersop', body: ''})
+        .expect(400)
+        .then((res)=> {
+            expect(res.body.msg).toBe('Comment cannot be blank')
+        })
+    })
+    test('6. Returns 400 error when missing username or body property', () => {
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send({ body: 'Test comment from no-user'})
+        .expect(400)
+        .then((res)=> {
+            expect(res.body.msg).toBe('bad request!')
+        })
+    })
+    test('7. Returns 400 error when given invalid article id (not a number)', () => {
+        return request(app)
+        .post('/api/articles/seven/comments')
+        .send({ username: 'rogersop', body: 'invalid article id'})
+        .expect(400)
+        .then((res)=> {
+            expect(res.body.msg).toBe('bad request!')
+        })
+    })
+
