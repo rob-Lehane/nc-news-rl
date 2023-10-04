@@ -176,7 +176,15 @@ describe.only('POST /api/articles/:article_id/comments', () => {
         .send({ username: 'rogersop', body: 'test comment, from rogersop.'})
     .then((res) => {
         expect(201)
-        expect(res.body.comment).toEqual('test comment, from rogersop.')
+        expect(res.body).toMatchObject({
+            comment: {
+              comment_id: 19,
+              body: 'test comment, from rogersop.',
+              article_id: 2,
+              author: 'rogersop',
+              votes: 0,
+            }
+          })
     })
     })
     test('2. Ignores extra properties on post body', () => {
@@ -185,7 +193,15 @@ describe.only('POST /api/articles/:article_id/comments', () => {
         .send({ username: 'rogersop', body: 'test comment, from rogersop.', extra: 3})
     .then((res) => {
         expect(201)
-        expect(res.body.comment).toEqual('test comment, from rogersop.')
+        expect(res.body).toMatchObject({
+            comment: {
+              comment_id: 19,
+              body: 'test comment, from rogersop.',
+              article_id: 2,
+              author: 'rogersop',
+              votes: 0,
+            }
+          })
     })
     })
     test('3. Returns 404 when given an invalid article ID', () => {
@@ -193,29 +209,45 @@ describe.only('POST /api/articles/:article_id/comments', () => {
         .post('/api/articles/459/comments')
         .send({ username: 'rogersop', body: 'test comment 2, from rogersop.'})
         .expect(404)
+        .then((res)=> {
+            expect(res.body.msg).toBe('Article not found for article ID: 459')
+        })
     })
     })
-    test('4. Returns 404 error when a username that does not exist is given', () => {
+    test('4. Returns 400 error when a username that does not exist is given', () => {
         return request(app)
         .post('/api/articles/3/comments')
         .send({ username: 'john', body: 'test comment from john'})
-        .expect(404)
+        .expect(400)
+        .then((res)=> {
+            expect(res.body.msg).toBe('bad request!')
+        })
     })
     test('5. Returns 400 error when a blank comment is given', () => {
         return request(app)
         .post('/api/articles/3/comments')
         .send({ username: 'rogersop', body: ''})
         .expect(400)
+        .then((res)=> {
+            expect(res.body.msg).toBe('Comment cannot be blank')
+        })
     })
     test('6. Returns 400 error when missing username or body property', () => {
         return request(app)
         .post('/api/articles/3/comments')
         .send({ body: 'Test comment from no-user'})
         .expect(400)
+        .then((res)=> {
+            expect(res.body.msg).toBe('bad request!')
+        })
     })
     test('7. Returns 400 error when given invalid article id (not a number)', () => {
         return request(app)
         .post('/api/articles/seven/comments')
         .send({ username: 'rogersop', body: 'invalid article id'})
+        .expect(400)
+        .then((res)=> {
+            expect(res.body.msg).toBe('bad request!')
+        })
     })
 

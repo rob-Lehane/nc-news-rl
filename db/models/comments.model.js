@@ -15,11 +15,14 @@ exports.fetchCommentsByArticle = (article_id) => {
 }
 
 exports.postNewComment = (article_id, author, body) => {
-    return db.query(`INSERT INTO
+    if (body.length === 0){
+        res.status(400).send({ err: 400, msg: 'Comment cannot be blank'})
+    }
+    else return db.query(`INSERT INTO
     comments (article_id, author, body)
     VALUES ($1, $2, $3)
     RETURNING *`, [article_id, author, body])
     .then(({rows}) => {
-        return rows[0].body;
+        return rows[0];
     })
 }
