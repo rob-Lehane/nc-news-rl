@@ -169,7 +169,7 @@ describe('GET /api/articles/:article_id/comment/', () => {
     })
 })
 
-describe.only('POST /api/articles/:article_id/comments', () => {
+describe('POST /api/articles/:article_id/comments', () => {
     test('1. Returns comment', () => {
         return request(app)
         .post('/api/articles/2/comments')
@@ -251,3 +251,23 @@ describe.only('POST /api/articles/:article_id/comments', () => {
         })
     })
 
+    describe.only('GET /api/users', () => {
+        test('Returns array of objects with correct properties', () => {
+            return request(app)
+            .get('/api/users')
+            .then(({body}) => {
+                expect(body.users).toHaveLength(4);
+                body.users.forEach((users) => {
+                    expect(users).toHaveProperty('username')
+                    expect(users).toHaveProperty('name')
+                    expect(users).toHaveProperty('avatar_url')
+                    
+                })
+            })
+        })
+        test('Should return a 404 error if the endpoint is mis-spelled', () => {
+            return request(app)
+            .get('/api/user')
+            .expect(404)
+        })
+    })
