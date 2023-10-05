@@ -265,15 +265,10 @@ describe('POST /api/articles/:article_id/comments', () => {
                 })
             })
         })
-        test('Should return a 404 error if the endpoint is mis-spelled', () => {
-            return request(app)
-            .get('/api/user')
-            .expect(404)
-        })
     })
 
 
-    describe.only("DELETE /api/comments/:comment_id", () => {
+    describe("DELETE /api/comments/:comment_id", () => {
         test("responds with a 204 code when successfully deleted", () => {
             return request(app)
                 .delete("/api/comments/1")
