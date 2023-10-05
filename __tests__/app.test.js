@@ -269,5 +269,11 @@ describe('POST /api/articles/:article_id/comments', () => {
                     expect(body.msg).toBe("comment not found for comment ID: 459");
                 });
         });
+
+        test("responds with a 400 code when given invalid comment ID (not a number)", () => {
+            return request(app)
+            .delete("/api/comments/one")
+            .expect(400)
+        })
     
     });
