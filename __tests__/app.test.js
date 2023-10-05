@@ -169,7 +169,7 @@ describe('GET /api/articles/:article_id/comment/', () => {
     })
 })
 
-describe.only('POST /api/articles/:article_id/comments', () => {
+describe('POST /api/articles/:article_id/comments', () => {
     test('1. Returns comment', () => {
         return request(app)
         .post('/api/articles/2/comments')
@@ -251,3 +251,29 @@ describe.only('POST /api/articles/:article_id/comments', () => {
         })
     })
 
+
+    describe.only("DELETE /api/comments/:comment_id", () => {
+        test("responds with a 204 code when successfully deleted", () => {
+            return request(app)
+                .delete("/api/comments/1")
+                .then((res)=> {
+                    expect(res.status).toBe(204)
+                })
+        });
+    
+        test("responds with a 404 code and an error message for invalid comment ID", () => {
+            return request(app)
+                .delete("/api/comments/459")
+                .expect(404)
+                .then(({ body }) => {
+                    expect(body.msg).toBe("comment not found for comment ID: 459");
+                });
+        });
+
+        test("responds with a 400 code when given invalid comment ID (not a number)", () => {
+            return request(app)
+            .delete("/api/comments/one")
+            .expect(400)
+        })
+    
+    });
