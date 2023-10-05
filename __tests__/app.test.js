@@ -251,6 +251,27 @@ describe('POST /api/articles/:article_id/comments', () => {
         })
     })
 
+    describe.only('GET /api/users', () => {
+        test('Returns array of objects with correct properties', () => {
+            return request(app)
+            .get('/api/users')
+            .then(({body}) => {
+                expect(body.users).toHaveLength(4);
+                body.users.forEach((users) => {
+                    expect(users).toHaveProperty('username')
+                    expect(users).toHaveProperty('name')
+                    expect(users).toHaveProperty('avatar_url')
+                    
+                })
+            })
+        })
+        test('Should return a 404 error if the endpoint is mis-spelled', () => {
+            return request(app)
+            .get('/api/user')
+            .expect(404)
+        })
+    })
+
 
     describe.only("DELETE /api/comments/:comment_id", () => {
         test("responds with a 204 code when successfully deleted", () => {
