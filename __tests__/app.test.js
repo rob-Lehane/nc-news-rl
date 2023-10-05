@@ -85,7 +85,7 @@ describe('GET /api/articles/:article_id', () => {
     })
 })
 
-describe('GET /api/articles/', () => {
+describe.only('GET /api/articles/', () => {
     test('1. Responds with an array of article objects with the correct properties', () => {
         return request(app)
         .get('/api/articles')
@@ -169,7 +169,7 @@ describe('GET /api/articles/:article_id/comment/', () => {
     })
 })
 
-describe.only('POST /api/articles/:article_id/comments', () => {
+describe('POST /api/articles/:article_id/comments', () => {
     test('1. Returns comment', () => {
         return request(app)
         .post('/api/articles/2/comments')
@@ -251,3 +251,44 @@ describe.only('POST /api/articles/:article_id/comments', () => {
         })
     })
 
+    describe.only('GET /api/articles?topic=', () => {
+        test('1. Returns articles filtered by topic', () => {
+            return request(app)
+            .get('/api/articles?topic=cats') 
+            .expect(200)
+            .then(({ body }) => {
+                    expect(body.articles).toHaveLength(1);
+                    body.articles.forEach((article) => {
+                        expect(article.topic).toBe('cats');
+                    });
+                });
+        });
+    
+        test('2. Returns all articles when no topic is specified', () => {
+            return request(app)
+                .get('/api/articles')
+                .expect(200)
+                .then(({ body }) => {
+                    body.articles.forEach((article) => {
+                        expect(typeof(article.author)).toBe('string')
+                        expect(typeof(article.title)).toBe('string')
+                        expect(typeof(article.article_id)).toBe('number')
+                        expect(typeof(article.topic)).toBe('string')
+                        const receivedTimestamp = Date.parse(article.created_at);
+                        expect(typeof(receivedTimestamp)).toBe('number');
+                        expect(typeof(article.votes)).toBe('number')
+                        expect(typeof(article.article_img_url)).toBe('string')
+                        expect(typeof(article.comment_count)).toBe('string')
+                    })
+                });
+        });
+    
+        test('3. Returns 404 when an invalid topic is specified', () => {
+            return request(app)
+                .get('/api/articles?topic=nonexistenttopic')
+                .expect(404)
+                .then((res) => {
+                    expect(res.body.msg).toBe('url not found');
+                });
+        });
+    });
