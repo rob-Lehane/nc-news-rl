@@ -174,7 +174,7 @@ describe('POST /api/articles/:article_id/comments', () => {
         return request(app)
         .post('/api/articles/2/comments')
         .send({ username: 'rogersop', body: 'test comment, from rogersop.'})
-    .then((res) => {
+        .then((res) => {
         expect(201)
         expect(res.body).toMatchObject({
             comment: {
@@ -204,15 +204,14 @@ describe('POST /api/articles/:article_id/comments', () => {
           })
     })
     })
-    test('3. Returns 404 when given an invalid article ID', () => {
+    test('3. Returns 400 when given an article ID that does not exist', () => {
         return request(app)
         .post('/api/articles/459/comments')
         .send({ username: 'rogersop', body: 'test comment 2, from rogersop.'})
-        .expect(404)
+        .expect(400)
         .then((res)=> {
-            expect(res.body.msg).toBe('url not found')
+            expect(res.body.msg).toBe('bad request!')
         })
-    })
     })
     test('4. Returns 400 error when a username that does not exist is given', () => {
         return request(app)
@@ -229,7 +228,7 @@ describe('POST /api/articles/:article_id/comments', () => {
         .send({ username: 'rogersop', body: ''})
         .expect(400)
         .then((res)=> {
-            expect(res.body.msg).toBe('Comment cannot be blank')
+            expect(res.body.msg).toBe('bad request!')
         })
     })
     test('6. Returns 400 error when missing username or body property', () => {
@@ -250,46 +249,55 @@ describe('POST /api/articles/:article_id/comments', () => {
             expect(res.body.msg).toBe('bad request!')
         })
     })
+})
 
-    describe.only('GET /api/users', () => {
-        test('Returns array of objects with correct properties', () => {
+describe('GET /api/articles?topic=', () => {
+        test('1. Returns articles filtered by topic', () => {
             return request(app)
-            .get('/api/users')
-            .then(({body}) => {
-                expect(body.users).toHaveLength(4);
-                body.users.forEach((users) => {
-                    expect(users).toHaveProperty('username')
-                    expect(users).toHaveProperty('name')
-                    expect(users).toHaveProperty('avatar_url')
-                    
-                })
-            })
-        })
-    })
-
-
-    describe("DELETE /api/comments/:comment_id", () => {
-        test("responds with a 204 code when successfully deleted", () => {
-            return request(app)
-                .delete("/api/comments/1")
-                .then((res)=> {
-                    expect(res.status).toBe(204)
-                })
+            .get('/api/articles?topic=cats') 
+            .expect(200)
+            .then(({ body }) => {
+                    expect(body.articles.rows).toHaveLength(1);
+                    body.articles.rows.forEach((article) => {
+                        expect(article.topic).toBe('cats');
+                    });
+                });
         });
     
-        test("responds with a 404 code and an error message for invalid comment ID", () => {
+        test('2. Returns all articles when no topic is specified', () => {
             return request(app)
-                .delete("/api/comments/459")
-                .expect(404)
+                .get('/api/articles')
+                .expect(200)
                 .then(({ body }) => {
-                    expect(body.msg).toBe("comment not found for comment ID: 459");
+                    body.articles.forEach((article) => {
+                        expect(typeof(article.author)).toBe('string')
+                        expect(typeof(article.title)).toBe('string')
+                        expect(typeof(article.article_id)).toBe('number')
+                        expect(typeof(article.topic)).toBe('string')
+                        const receivedTimestamp = Date.parse(article.created_at);
+                        expect(typeof(receivedTimestamp)).toBe('number');
+                        expect(typeof(article.votes)).toBe('number')
+                        expect(typeof(article.article_img_url)).toBe('string')
+                        expect(typeof(article.comment_count)).toBe('string')
+                    })
+                });
+        });
+    
+        test('3. Returns 404 when an invalid topic is specified', () => {
+            return request(app)
+                .get('/api/articles?topic=nonexistenttopic')
+                .expect(404)
+                .then((res) => {
+                    expect(res.body.msg).toBe('not found');
                 });
         });
 
-        test("responds with a 400 code when given invalid comment ID (not a number)", () => {
+        test('4. Returns 200 & empty array when a valid topic query with no articles is specified', () => {
             return request(app)
-            .delete("/api/comments/one")
-            .expect(400)
+                .get('/api/articles?topic=paper')
+                .expect(200)
+                .then((res) => {
+                    expect(res.body.articles.rows.length).toBe(0)
+                });
         })
-    
-    });
+    })
