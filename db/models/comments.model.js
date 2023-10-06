@@ -1,10 +1,11 @@
-const db = require('../connection')
+const db = require('../connection');
+const { fetchArticleById } = require('./articles.model');
 
 exports.fetchCommentsByArticle = (article_id) => {
-    return doesArticleExist(article_id)
-        .then((articleExists) => {
-            if (!articleExists) {
-                res.status(404).send({ err: 404, msg: `Article not found for article ID: ${articleId}` });
+    return fetchArticleById(article_id)
+        .then((article) => {
+            if (!article) {
+                Promise.reject({ status: 404, msg: `Article not found for article ID: ${articleId}` });
             }
             return db.query(`SELECT
                 * 
@@ -22,13 +23,14 @@ exports.fetchCommentsByArticle = (article_id) => {
 
 exports.postNewComment = (article_id, author, body) => {
     if (body.length === 0){
-        res.status(400).send({ err: 400, msg: 'Comment cannot be blank'})
+        return Promise.reject({ status: 400, msg: 'bad request!'})
     }
-    else return db.query(`INSERT INTO
+    else {
+        return db.query(`INSERT INTO
     comments (article_id, author, body)
     VALUES ($1, $2, $3)
     RETURNING *`, [article_id, author, body])
     .then(({rows}) => {
         return rows[0];
     })
-}
+}}

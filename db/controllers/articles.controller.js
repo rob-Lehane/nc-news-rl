@@ -1,11 +1,14 @@
 const { fetchArticleById, fetchArticles } = require('../models/articles.model.js')
 
 exports.getArticles = (req, res, next) => {
-    const { topic } = req.query
-    fetchArticles(topic).then((articles) => {
-        res.status(200).send({articles})
-    })
-    .catch(next);
+    const { topic } = req.query;
+    const topicToFetch = topic !== undefined ? topic : "";
+
+    fetchArticles(topicToFetch)
+        .then((articles) => {
+            res.status(200).send({ articles });
+        })
+        .catch(next);
 }
 
 exports.getArticleById = (req, res, next) => {

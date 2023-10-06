@@ -6,16 +6,16 @@ exports.getTopics = (req, res, next) => {
     })
 }
 
-exports.doesTopicExist = (topic) => {
-    return db.query(`SELECT 
-    * 
-    FROM 
-    topics
-    WHERE
-    topic = $1`, [topic])
-    .then(({rows}) => {
-        if (rows.length === 0)
-        {return false}
-        else return true;
-    })
-}
+// exports.doesTopicExist = (topic) => {
+//     return db.query(`SELECT 
+//     * 
+//     FROM 
+//     topics
+//     WHERE
+//     topic = $1`, [topic])
+//     .then(({rows}) => {
+//         if (rows.length === 0)
+//         {return false}
+//         else return true;
+//     })
+// }

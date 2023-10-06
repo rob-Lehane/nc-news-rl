@@ -1,20 +1,23 @@
-exports.handleCustomErrors = (err, req, res, next) => {
-    if (err.status) {
-        res.status(err.status).send({ msg: err.message });
-    }
-    if (err.code === '22P02' || err.code === '23503') {
+exports.handlePSQLErrors = (err, req, res, next) => {
+    console.log(err)
+    if (err.code === '22P02' || err.code === '23503' || err.code === '23502') {
         res.status(400).send({ msg: 'bad request!'})
+    }
+    else {
+        next(err)
+    }
+  };
+
+exports.handleCustomErrors = (err, req, res, next) => {
+    if (err.status && err.msg) {
+        res.status(err.status).send({ msg: err.msg });
     }
     else {
     next(err)
     }
 }
 
-exports.handle404Error = (err, req, res, next) => {
-    res.status(404).send({ msg: "url not found" });
-  };
-
 exports.handle500Errors = (err, req, res, next) => {
-    console.log("500 error in console", err)
+    console.log(err, "unhandled error")
     res.status(500).send({ msg: 'internal server error' })
 }

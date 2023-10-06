@@ -85,7 +85,7 @@ describe('GET /api/articles/:article_id', () => {
     })
 })
 
-describe.only('GET /api/articles/', () => {
+describe('GET /api/articles/', () => {
     test('1. Responds with an array of article objects with the correct properties', () => {
         return request(app)
         .get('/api/articles')
@@ -174,7 +174,7 @@ describe('POST /api/articles/:article_id/comments', () => {
         return request(app)
         .post('/api/articles/2/comments')
         .send({ username: 'rogersop', body: 'test comment, from rogersop.'})
-    .then((res) => {
+        .then((res) => {
         expect(201)
         expect(res.body).toMatchObject({
             comment: {
@@ -204,15 +204,14 @@ describe('POST /api/articles/:article_id/comments', () => {
           })
     })
     })
-    test('3. Returns 404 when given an invalid article ID', () => {
+    test('3. Returns 400 when given an article ID that does not exist', () => {
         return request(app)
         .post('/api/articles/459/comments')
         .send({ username: 'rogersop', body: 'test comment 2, from rogersop.'})
-        .expect(404)
+        .expect(400)
         .then((res)=> {
-            expect(res.body.msg).toBe('url not found')
+            expect(res.body.msg).toBe('bad request!')
         })
-    })
     })
     test('4. Returns 400 error when a username that does not exist is given', () => {
         return request(app)
@@ -229,7 +228,7 @@ describe('POST /api/articles/:article_id/comments', () => {
         .send({ username: 'rogersop', body: ''})
         .expect(400)
         .then((res)=> {
-            expect(res.body.msg).toBe('Comment cannot be blank')
+            expect(res.body.msg).toBe('bad request!')
         })
     })
     test('6. Returns 400 error when missing username or body property', () => {
@@ -250,15 +249,16 @@ describe('POST /api/articles/:article_id/comments', () => {
             expect(res.body.msg).toBe('bad request!')
         })
     })
+})
 
-    describe.only('GET /api/articles?topic=', () => {
+describe('GET /api/articles?topic=', () => {
         test('1. Returns articles filtered by topic', () => {
             return request(app)
             .get('/api/articles?topic=cats') 
             .expect(200)
             .then(({ body }) => {
-                    expect(body.articles).toHaveLength(1);
-                    body.articles.forEach((article) => {
+                    expect(body.articles.rows).toHaveLength(1);
+                    body.articles.rows.forEach((article) => {
                         expect(article.topic).toBe('cats');
                     });
                 });
@@ -288,7 +288,16 @@ describe('POST /api/articles/:article_id/comments', () => {
                 .get('/api/articles?topic=nonexistenttopic')
                 .expect(404)
                 .then((res) => {
-                    expect(res.body.msg).toBe('url not found');
+                    expect(res.body.msg).toBe('not found');
                 });
         });
-    });
+
+        test('4. Returns 200 & empty array when a valid topic query with no articles is specified', () => {
+            return request(app)
+                .get('/api/articles?topic=paper')
+                .expect(200)
+                .then((res) => {
+                    expect(res.body.articles.rows.length).toBe(0)
+                });
+        })
+    })
