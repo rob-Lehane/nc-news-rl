@@ -301,3 +301,14 @@ describe('GET /api/articles?topic=', () => {
                 });
         })
     })
+
+describe('GET /api/articles/:article_id (comment_count)', () => {
+        test('1. Returns correct comment count', () => {
+            return request(app)
+            .get('/api/articles/3')
+            .expect(200)
+            .then(({body})=> {
+                expect(body.article.comment_count).toBe("2")
+            })
+        })
+    })
