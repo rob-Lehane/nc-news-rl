@@ -59,5 +59,25 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "Posts a comment to given article_id and returns comment",
+    "queries": { "username": "exampleusername", "body": "examplebody" },
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 14,
+          "votes": 0,
+          "article_id": 1,
+          "author": "exampleusername",
+          "body": "examplebody",
+          "created_at": "2018-05-30T15:59:13.341Z"
+        }
+      ]
+    }
+  },
+  "DELETE /api/comments/comment_id": {
+    "description": "Deletes a comment and returns a 204 code",
+    "queries": ["comment_id"]
   }
 }
