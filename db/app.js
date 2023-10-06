@@ -5,6 +5,9 @@ const { getApi } = require("./controllers/api.controller")
 const { getArticleById, getArticles } = require("./controllers/articles.controller")
 const { handleCustomErrors, handle500Errors, handlePSQLErrors } = require('./controllers/errors.controller');
 const { getCommentsByArticle, addNewComment } = require("./controllers/comments.controller");
+const { handleCustomErrors, handle500Errors, handle404Error } = require('./controllers/errors.controller');
+const { getUsers } = require("./controllers/users.controller");
+const { getCommentsByArticle, addNewComment, deleteComment } = require("./controllers/comments.controller");
 
 app.use(express.json());
 
@@ -18,7 +21,11 @@ app.get("/api/articles/:article_id", getArticleById)
 
 app.get("/api/articles/:article_id/comments", getCommentsByArticle)
 
+app.get("/api/users", getUsers)
+
 app.post("/api/articles/:article_id/comments", addNewComment)
+
+app.delete("/api/comments/:comment_id", deleteComment);
 
 app.all('/*', (req, res, next) => {
     res.status(404).send({msg: 'app not found'})
