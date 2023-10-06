@@ -50,7 +50,7 @@ describe('GET /api/', () => {
     })
 })
 
-describe.only('GET /api/articles/:article_id', () => {
+describe('GET /api/articles/:article_id', () => {
     test('1. Returns correct article object', () => {
         return request(app)
         .get('/api/articles/3')
@@ -65,7 +65,6 @@ describe.only('GET /api/articles/:article_id', () => {
             expect(receivedTimestamp).toBe(1604394720000);
             expect(body.article.votes).toBe(0)
             expect(body.article.article_img_url).toBe("https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700")
-            expect(body.article.comment_count).toBe("2")
         })
     })
     test('2. Returns 404 when given an invalid id which is correctly formatted as a number', () => {
@@ -300,5 +299,16 @@ describe('GET /api/articles?topic=', () => {
                 .then((res) => {
                     expect(res.body.articles.rows.length).toBe(0)
                 });
+        })
+    })
+
+describe('GET /api/articles/:article_id (comment_count)', () => {
+        test('1. Returns correct comment count', () => {
+            return request(app)
+            .get('/api/articles/3')
+            .expect(200)
+            .then(({body})=> {
+                expect(body.article.comment_count).toBe("2")
+            })
         })
     })
