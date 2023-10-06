@@ -2,7 +2,24 @@ const db = require('../connection')
 const { doesTopicExist } = require('./topics.model')
 
 exports.fetchArticleById = (article_id) => {
-    return db.query(`SELECT * FROM articles WHERE article_id = $1;`, [article_id])
+    return db.query(`SELECT
+    articles.*,
+    COALESCE(comment_counts.comment_count, 0) AS comment_count
+    FROM
+    articles
+    LEFT JOIN (
+    SELECT
+    article_id,
+    COUNT(*) AS comment_count
+    FROM
+    comments
+    GROUP BY
+    article_id
+    ) AS comment_counts
+    ON
+    articles.article_id = comment_counts.article_id
+    WHERE
+    articles.article_id = $1;`, [article_id])
     .then(({rows}) => {
         if(!rows.length) return Promise.reject({ status: 404, msg: `No article found for article ID: ${article_id}` })
         else return rows[0];
