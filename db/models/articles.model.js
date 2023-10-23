@@ -91,3 +91,11 @@ exports.fetchArticles = (topic) => {
 })
 }
 
+exports.updateArticleVotes = (articleId, inc_votes) => {
+    return db.query(
+        `UPDATE articles
+         SET votes = votes + $1
+         WHERE article_id = $2`,
+        [inc_votes, articleId]
+    );
+};
