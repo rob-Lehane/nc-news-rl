@@ -312,3 +312,56 @@ describe('GET /api/articles/:article_id (comment_count)', () => {
             })
         })
     })
+
+describe.only('PATCH /api/articles/:article_id', () => {
+        test('responds with a 200 code and an updated article', () => {
+            const updateVotes = {
+                inc_votes: 10
+            };
+        return request(app)
+            .patch('/api/articles/3')
+            .send(updateVotes)
+            .expect(200)
+            .then(({body}) => {
+                expect(body.article).toMatchObject(
+                    {
+                        title: "Eight pug gifs that remind me of mitch",
+                        topic: "mitch",
+                        author: "icellusedkars",
+                        body: "some gifs",
+                        votes: 10,
+                        article_img_url:
+                          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                      }
+                )
+            })
+        })
+    
+        test('responds with a 404 code and an error message for invalid article ID that is a number', () => {
+            const updateVotes = {
+                inc_votes: 10
+            };
+            return request(app)
+                .patch('/api/articles/9999') 
+                .send(updateVotes)
+                .expect(404)
+                .then(({ body }) => {
+                    expect(body.msg).toBe("No article found for article ID: 9999");
+                });
+        });
+    
+        test('responds with a 400 code and an error message for invalid vote value (not a number)', () => {
+            const updateVotes = {
+                inc_votes: 'ten'
+            }
+            return request(app)
+                .patch('/api/articles/3')
+                .send(updateVotes)
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body.msg).toBe("bad request!");
+                });
+        });
+    
+    
+    })
