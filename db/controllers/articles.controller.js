@@ -1,10 +1,7 @@
 const { fetchArticleById, fetchArticles, updateArticleVotes } = require('../models/articles.model.js')
 
 exports.getArticles = (req, res, next) => {
-    const { topic } = req.query;
-    const topicToFetch = topic !== undefined ? topic : "";
-
-    fetchArticles(topicToFetch)
+    fetchArticles(req.query)
         .then((articles) => {
             res.status(200).send({ articles });
         })
@@ -22,7 +19,6 @@ exports.getArticleById = (req, res, next) => {
 exports.updateArticleVotes = (req, res, next) => {
     const articleId = req.params.article_id;
     const { inc_votes } = req.body;
-
     updateArticleVotes(articleId, inc_votes)
         .then(() => fetchArticleById(articleId))
         .then((article) => {
