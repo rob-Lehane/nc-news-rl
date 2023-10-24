@@ -33,7 +33,9 @@ exports.fetchArticles=({topic='%',sort_by='created_at',order='desc'})=>{
             'topic',
             'author',
             'created_at',
-            'article_img_url'
+            'article_img_url',
+            'comment_count',
+            'votes'
             ].includes(sort_by) ||
             !['asc','desc'].includes(order)
         ) {
