@@ -22,14 +22,14 @@ exports.addNewComment = (req, res, next) => {
 
 
 exports.deleteComment = (req, res, next) => {
-    const commentId = req.params.comment_id;
-    Promise.all([doesCommentExist(commentId), removeComment(commentId)])
-    .then(([commentExists]) => {
-        if (!commentExists) {
-            res.status(404).send({ msg: `comment not found for comment ID: ${commentId}` });
-        } else {
-            res.status(204).send();
-        }
-    })
-    .catch(next); 
-};
+                const commentId = req.params.comment_id;
+                Promise.all([doesCommentExist(commentId), removeComment(commentId)])
+                .then(([commentExists]) => {
+                    if (!commentExists) {
+                        res.status(404).send({ msg: `comment not found for comment ID: ${commentId}` });
+                    } else {
+                        res.status(204).send();
+                    }
+                })
+                .catch(next); 
+            };

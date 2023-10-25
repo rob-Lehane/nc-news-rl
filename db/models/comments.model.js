@@ -42,3 +42,17 @@ exports.removeComment = (comment_id) => {
                     comment_id = $1`,
                     [comment_id])
                     }
+
+exports.doesCommentExist = (comment_id) => {
+    return db.query(`SELECT 
+    * 
+    FROM 
+    comments
+    WHERE
+    comment_id = $1`, [comment_id])
+    .then(({rows}) => {
+        if (rows.length === 0)
+        {return false}
+        else return true;
+    })
+}
