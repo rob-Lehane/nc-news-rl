@@ -387,9 +387,5 @@ describe.only('PATCH /api/comments/comment_id', () => {
         .patch('/api/comments/6')
         .send(updateVotes)
         .expect(200)
-        .then(({body}) => {
-            console.log(body)
-        }
-            )
         })
     })

@@ -39,7 +39,6 @@ exports.updateCommentVotes = (req, res, next) => {
                 const { inc_votes } = req.body;
                 updateCommentVotes(commentId, inc_votes)
                     .then((comment) => {
-                        console.log("made it to then block")
                         if (!comment) {
                             return Promise.reject({ status: 404, msg: "comment not found" });
                         }
