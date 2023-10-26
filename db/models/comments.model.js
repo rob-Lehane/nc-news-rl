@@ -56,3 +56,12 @@ exports.doesCommentExist = (comment_id) => {
         else return true;
     })
 }
+
+exports.updateCommentVotes = (commentId, inc_votes) => {
+    return db.query(
+        `UPDATE comments
+         SET votes = votes + $1
+         WHERE comment_id = $2`,
+        [inc_votes, commentId]
+    )
+}

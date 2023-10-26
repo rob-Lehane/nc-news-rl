@@ -358,7 +358,7 @@ describe('PATCH /api/articles/:article_id', () => {
     
     })
 
-describe.only("DELETE /api/comments/:comment_id", () => {
+describe("DELETE /api/comments/:comment_id", () => {
         test("responds with a 204 code when successfully deleted", () => {
             return request(app)
                 .delete("/api/comments/1")
@@ -377,3 +377,19 @@ describe.only("DELETE /api/comments/:comment_id", () => {
         });
 
     });
+
+describe.only('PATCH /api/comments/comment_id', () => {
+    test('responds with a 200 code', () => {
+        const updateVotes = {
+            inc_votes: 10
+        };
+    return request(app)
+        .patch('/api/comments/6')
+        .send(updateVotes)
+        .expect(200)
+        .then(({body}) => {
+            console.log(body)
+        }
+            )
+        })
+    })

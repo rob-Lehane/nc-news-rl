@@ -1,5 +1,4 @@
 const db = require('../connection')
-const { doesTopicExist } = require('./topics.model')
 
 exports.fetchArticleById = (article_id) => {
     return db.query(`SELECT

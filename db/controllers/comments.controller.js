@@ -1,5 +1,4 @@
-const { fetchCommentsByArticle, postNewComment, removeComment, doesCommentExist } = require('../models/comments.model')
-const { doesArticleExist } = require('../models/articles.model')
+const { fetchCommentsByArticle, postNewComment, removeComment, doesCommentExist, updateCommentVotes } = require('../models/comments.model')
 
 exports.getCommentsByArticle = (req, res, next) => {
     const articleId = +req.params.article_id;
@@ -32,4 +31,19 @@ exports.deleteComment = (req, res, next) => {
                     }
                 })
                 .catch(next); 
+            };
+
+
+exports.updateCommentVotes = (req, res, next) => {
+                const commentId = req.params.comment_id;
+                const { inc_votes } = req.body;
+                updateCommentVotes(commentId, inc_votes)
+                    .then((comment) => {
+                        console.log("made it to then block")
+                        if (!comment) {
+                            return Promise.reject({ status: 404, msg: "comment not found" });
+                        }
+                        res.status(200).send({comment});
+                    })
+                    .catch(next);
             };
