@@ -4,7 +4,7 @@ To access this API, use https://nc-news-repo.onrender.com
 
 # Description
 
-This is a web app which allows the hosting of news articles, with comments, users and separate topics.
+This is a backend API which allows the hosting of news articles, with comments, users and separate topics.
 
 ## Getting Started
 
